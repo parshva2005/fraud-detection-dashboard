@@ -6,78 +6,38 @@ import pandas as pd
 app = Flask(__name__)
 CORS(app)  # Enable CORS for React frontend
 
-# Safely Load the AI Model
+# Safely Load or Train the AI Model
 print("Loading Model...")
 try:
     with open('model.pkl', 'rb') as f:
         model = pickle.load(f)
     print("✅ Model loaded successfully!")
 except Exception as e:
-    print(f"❌ Error loading model.pkl: {e}")
-    model = None
+    print(f"⚠️ Error loading model.pkl: {e}")
+    print("Retraining model dynamically on the server...")
+    try:
+        from sklearn.svm import SVC
+        from sklearn.preprocessing import StandardScaler
+        from sklearn.pipeline import make_pipeline
+        df = pd.read_csv('insurance_fraud_data_preprocessed.csv')
+        X = df[['annual_income', 'age_of_driver', 'policy deductible']]
+        y = df['fraud reported']
+        model = make_pipeline(StandardScaler(), SVC(probability=True, random_state=42))
+        model.fit(X, y)
+        with open('model.pkl', 'wb') as f:
+            pickle.dump(model, f)
+        print("✅ Model retrained and saved successfully!")
+    except Exception as e2:
+        print(f"❌ Error retraining model: {e2}")
+        model = None
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    prediction = None
-    probability = None
-    prob_safe = None
-    risk_tier = None
-    red_flags = []
-    
-    if request.method == 'POST':
-        try:
-            # Safely get form data (defaults to 0 if missing)
-            income = float(request.form.get('annual_income', 0))
-            age = float(request.form.get('age_of_driver', 0))
-            deductible = float(request.form.get('policy_deductible', 0))
-            
-            input_data = pd.DataFrame([[income, age, deductible]], 
-                                      columns=['annual_income', 'age_of_driver', 'policy deductible'])
-            
-            if model:
-                pred = model.predict(input_data)[0]
-                prob = model.predict_proba(input_data)[0]
-                fraud_prob = round(prob[1] * 100, 2)
-                safe_prob = round(prob[0] * 100, 2)
-                
-                # Determine Risk Tier
-                if fraud_prob >= 80:
-                    risk_tier = "CRITICAL RISK"
-                elif fraud_prob >= 50:
-                    risk_tier = "HIGH RISK"
-                elif fraud_prob >= 20:
-                    risk_tier = "MODERATE RISK"
-                else:
-                    risk_tier = "LOW RISK"
-
-                # Generate Red Flags
-                if age < 25 and deductible >= 1000:
-                    red_flags.append("Young driver with abnormally high policy deductible.")
-                if income < 35000 and deductible >= 1000:
-                    red_flags.append("Deductible is unusually high relative to reported annual income.")
-                
-                # Final Output
-                if pred == 1:
-                    prediction = "Fraudulent Claim"
-                    probability = fraud_prob
-                    prob_safe = safe_prob
-                else:
-                    prediction = "Safe Claim"
-                    probability = safe_prob
-                    prob_safe = fraud_prob
-            else:
-                prediction = "Error: model.pkl not found. Please train model first."
-
-        except Exception as e:
-            print(f"❌ Processing Error: {e}")
-            prediction = "Error processing request. Please check your inputs."
-
-    return render_template('index.html', 
-                           prediction=prediction, 
-                           probability=probability,
-                           prob_safe=prob_safe,
-                           risk_tier=risk_tier,
-                           red_flags=red_flags)
+    return jsonify({
+        "status": "online",
+        "message": "Fraud Detection ML API is running.",
+        "model_loaded": model is not None
+    })
 @app.route('/api/predict', methods=['POST'])
 def api_predict():
     if not model:
