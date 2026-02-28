@@ -20,3 +20,8 @@ venv.bak/
 .idea
 .DS_Store
 Thumbs.db
+
+# Jupyter / Virtual Env
+.ipynb_checkpoints/
+.venv/
+templates/
