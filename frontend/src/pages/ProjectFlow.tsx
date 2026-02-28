@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { PageWrapper } from '../components/layout/PageWrapper';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Database, Search, GitMerge, Cpu, Settings, Cloud, X } from 'lucide-react';

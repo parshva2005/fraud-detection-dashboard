@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { PageWrapper } from '../components/layout/PageWrapper';
 import { ArrowRight, Database, AlertTriangle, Trophy, ShieldCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';

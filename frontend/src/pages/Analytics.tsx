@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { PageWrapper } from '../components/layout/PageWrapper';
 import { InteractiveChart } from '../components/charts/InteractiveChart';
 import {

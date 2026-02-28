@@ -1,6 +1,6 @@
-import React from 'react';
+
 import { PageWrapper } from '../components/layout/PageWrapper';
-import { Cpu, Maximize, Activity, Network } from 'lucide-react';
+import { Cpu, Maximize, Network } from 'lucide-react';
 
 export const Architecture = () => {
     return (
