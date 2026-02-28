@@ -25,3 +25,6 @@ Thumbs.db
 .ipynb_checkpoints/
 .venv/
 templates/
+
+# Local Notes
+DEPLOYMENT_GUIDE.md
