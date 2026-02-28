@@ -13,6 +13,30 @@ const initAudio = () => {
     return audioCtx;
 };
 
+// Unlock AudioContext globally on first user interaction for Mobile Safari/Chrome
+let audioUnlocked = false;
+const unlockAudio = () => {
+    if (audioUnlocked) return;
+    const ctx = initAudio();
+    if (ctx) {
+        const _osc = ctx.createOscillator();
+        const _gain = ctx.createGain();
+        _gain.gain.value = 0;
+        _osc.connect(_gain);
+        _gain.connect(ctx.destination);
+        _osc.start(0);
+        _osc.stop(0);
+        audioUnlocked = true;
+    }
+    window.removeEventListener('touchstart', unlockAudio);
+    window.removeEventListener('click', unlockAudio);
+};
+
+if (typeof window !== 'undefined') {
+    window.addEventListener('touchstart', unlockAudio, { once: true });
+    window.addEventListener('click', unlockAudio, { once: true });
+}
+
 export const playClickSound = () => {
     try {
         const ctx = initAudio();

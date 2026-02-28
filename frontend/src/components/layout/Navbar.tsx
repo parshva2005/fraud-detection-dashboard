@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useTheme } from '../../context/ThemeContext';
-import { ShieldCheck, User, LogOut, Sun, Moon } from 'lucide-react';
+import { ShieldCheck, User, LogOut, Sun, Moon, Menu, X } from 'lucide-react';
 import { playClickSound, playSwooshSound } from '../../utils/sounds';
 
 export const Navbar: React.FC = () => {
     const { theme, toggleTheme } = useTheme();
     const [isLogged, setIsLogged] = useState(true);
     const [showHistory, setShowHistory] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Enhanced Mock Data for Recent Predictions
     const mockPredictions = [
@@ -68,8 +69,8 @@ export const Navbar: React.FC = () => {
                         ))}
                     </div>
 
-                    {/* Right side controls */}
-                    <div className="flex items-center gap-4 border-l border-border pl-4">
+                    {/* Right side controls and Mobile Toggle */}
+                    <div className="flex items-center gap-2 sm:gap-4 border-l border-border pl-2 sm:pl-4">
                         {/* Theme Toggle */}
                         <button
                             onClick={() => { playClickSound(); toggleTheme(); }}
@@ -134,10 +135,43 @@ export const Navbar: React.FC = () => {
                                 Sign In
                             </button>
                         )}
+
+                        {/* Mobile Menu Button */}
+                        <div className="md:hidden flex items-center pl-2 border-l border-border">
+                            <button
+                                onClick={() => { playClickSound(); setIsMobileMenuOpen(!isMobileMenuOpen); }}
+                                className="p-2 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                            >
+                                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                            </button>
+                        </div>
                     </div>
 
                 </div>
             </div>
+
+            {/* Mobile Navigation Menu */}
+            {isMobileMenuOpen && (
+                <div className="md:hidden glass border-t border-border animate-in slide-in-from-top-2 duration-200">
+                    <div className="px-4 pt-2 pb-4 space-y-1">
+                        {links.map((link) => (
+                            <NavLink
+                                key={link.path}
+                                to={link.path}
+                                onClick={() => { playClickSound(); setIsMobileMenuOpen(false); }}
+                                className={({ isActive }) =>
+                                    `block px-3 py-3 rounded-lg text-base font-medium transition-colors ${isActive
+                                        ? 'bg-primary/10 text-primary'
+                                        : 'hover:bg-black/5 dark:hover:bg-white/10 text-gray-700 dark:text-gray-300'
+                                    }`
+                                }
+                            >
+                                {link.name}
+                            </NavLink>
+                        ))}
+                    </div>
+                </div>
+            )}
         </nav>
     );
 };
