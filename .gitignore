@@ -1,0 +1,22 @@
+# Build output
+frontend/dist
+frontend/node_modules
+
+# Python virtual environment and modules
+__pycache__/
+*.py[cod]
+*$py.class
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Pickled ML Models (Optional: Comment out if you WANT to upload model.pkl)
+# model.pkl
+
+# IDE / OS files
+.vscode
+.idea
+.DS_Store
+Thumbs.db
